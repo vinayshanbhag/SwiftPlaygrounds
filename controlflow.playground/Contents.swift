@@ -8,7 +8,7 @@ for i in 1...5 {
     print(i, terminator: " ")
 }
 print("\n")
-
+ 
 //iterate over a half open range
 for i in 0..<5 {
     print(i,terminator: " ")
