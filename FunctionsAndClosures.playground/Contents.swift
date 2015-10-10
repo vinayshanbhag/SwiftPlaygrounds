@@ -260,6 +260,32 @@ sorted = fruits.sort(>)
 sorted
 
 
+// Closure capture
+// Inner function incr() has closure over n and value variables in the enclosing function
+func makeIncrementer(n:Int)->()->Int {
+    var value = 0
+    func incr()->Int{
+        value += n
+        return value
+    }
+    return incr
+}
 
+let incrementByTen = makeIncrementer(10)
+incrementByTen()
+incrementByTen()
 
+let incrementByOne = makeIncrementer(1)
+incrementByOne()
+incrementByOne()
+
+incrementByTen()
+
+// Functions are reference types. anotherIncrementByTen and incrementByTen refer to the same.
+var anotherIncrementByTen = incrementByTen
+anotherIncrementByTen()
+
+// now anotherIncrementByTen points to a new incrementer
+anotherIncrementByTen = makeIncrementer(10)
+anotherIncrementByTen()
 
