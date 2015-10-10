@@ -40,6 +40,11 @@ print(message)
 let reducedMessage = words.reduce("",combine:{ ($0 == "" ? $0 : $0 + " ") + $1 } )
 print(reducedMessage)
 
+// Using reduce to find max integer from array
+let numbers = [4, 7, 1, 19, 6, 5, 6, 9]
+var m = numbers.reduce(numbers[0], combine: {return ($0 < $1) ? $1 : $0} )
+m
+
 /* Dictionary */
 
 var myFruits = [1:"Apple",2:"Orange",3:"Banana",4:"Pomegranate",5:"Pineapple",6:"Jackfruit",7:"Mango",8:"Watermelon",9:"Apricot",10:"Peach"]
