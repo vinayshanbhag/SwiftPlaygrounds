@@ -116,7 +116,9 @@ myDocument.save() // lazy property exporter is initialized when exporter is firs
 // Lazy properties must be variables (var)
 // Lazy properties cannot have observers (didSet, willSet)
 // Lazy properties may be of any type
-// Lazy properties may appear in both reference(class) and value types (structures and enumerations)
+// Lazy properties may appear in classes and structures, but not enumerations. As enumerations cannot have stored properties
+// Only stored properties may be lazy. Computed properties cannot be lazy
+// Lazy properties if accessed from multiple threads, may be initialized more than once
 
 // Stored Properties and Instance Variables
 // Swift unifies both these concepts into a single property declaration
@@ -187,8 +189,226 @@ struct Counter {
 var counter = Counter()
 counter.count = 10
 
+
+// Type properties
+// Associated with a type and not an instance
+// defined with the static keyword
+// Use class keyword instead of static in case of computed type properties of a class, so that 
+// they may be overridden in a subclass
+// Type properties may be stored or computed
+// All stored type properties are lazily instantiated upon first access, without an explicit lazy declaration
+// Stored type properties are guaranteed to be initialized exactly once, even if accessed from multiple threads
+// Stored type properties support property observers (willSet, didSet)
+// Computed type properties have get method and optionally a set method if not read-only
+// Static properties are not supported in generic types. Class properties are supported with generic types
 enum SomeEnum{
-   }
+    case a, b, c
+    
+    // var storedProperty = 0 //error: not allowed in enums
+    var computedProperty:Int{
+        get{ // optional if read-only
+            switch self{
+            case .a: return 1
+            case .b: return 2
+            case .c: return 3
+            }
+        }
+        
+        set {
+            switch newValue {
+            case 1: self = .a
+            case 2: self = .b
+            case 3: self = .c
+            default: self = .a
+            }
+        }
+    }
+    
+    // stored type property
+    static var storedTypeProperty = "SomeEnumWithTypeProperty"
+    
+    // computed type property
+    static var computedTypeProperty:String {
+        get{
+            return "I am \(storedTypeProperty)"
+        }
+        set {
+            storedTypeProperty = newValue
+        }
+    }
+}
+
+var someEnum = SomeEnum.a // new instance with value .a
+someEnum.computedProperty // 1
+someEnum.computedProperty = 2 // set computed propert to 2. enum value to .b
+someEnum // now has value .b
+
+SomeEnum.storedTypeProperty
+SomeEnum.computedTypeProperty
+SomeEnum.computedTypeProperty = "...Anonymous"
+SomeEnum.computedTypeProperty
+
+struct SomeStruct {
+    
+
+    var storedProperty = 0
+    var computedProperty:Int{
+        get { // can be omitted if read-only
+            return storedProperty * 2
+        }
+        set {
+            storedProperty = newValue/2
+        }
+    }
+    
+    // stored type property
+    static var storedTypeProperty = "SomeEnumWithTypeProperty"
+    
+    // computed type property
+    static var computedTypeProperty:String {
+        get{
+            return "I am a \(storedTypeProperty)"
+        }
+    }
+}
+
+class SomeClass {
+    var storedProperty = 0
+    var computedProperty:Int{
+        get { // can be omitted if read-only
+            return storedProperty * 2
+        }
+        set {
+            storedProperty = newValue/2
+        }
+    }
+    
+    // stored type property
+    static var storedTypeProperty = "SomeEnumWithTypeProperty"
+    
+    // computed type property
+    static var computedTypeProperty:String {
+        get{
+            return "I am a \(storedTypeProperty)"
+        }
+    }
+    
+    class var overridableComputedTypeProperty:Int {
+        return 1
+    }
+}
+
+class SubclassOfSomeClass:SomeClass {
+    // static to prevent further override
+    override static var overridableComputedTypeProperty:Int {
+        return 2
+    }
+}
+
+SomeClass.overridableComputedTypeProperty
+SubclassOfSomeClass.overridableComputedTypeProperty
+
+
+// Methods
+// Functions associated with a particular type
+// Classes, Structures and Enumerations can define instance methods and type methods
+// Instance methods belong to an instance of the type
+// Type methods belong to the type
+// Instance methods must be declared mutating, if they modify state of a value type
+// Instance methods of reference type are implicitly mutating
+// Constants refering to a value type are immutable. i.e. cannot mutate or call a mutating function
+// Type methods cannot access instance properties or methods
+// Type methods are declared using static keyword. Use class keyword to enable overriding of a class method in its subclass
+// Type methods are supported with generic types
+
+
+// Syntax
+class BeanCounter {
+    var beanCount = 0
+    
+    // Instance method
+    func increment() -> Int{
+        return ++beanCount
+    }
+    func decrement() -> Int{
+        return --beanCount
+    }
+}
+
+let myBeans = BeanCounter()
+for _ in 1...10{
+    myBeans.increment() // reference type can be mutated eventhough myBeans is a constant
+}
+myBeans.beanCount
+
+// Syntax value type - Structure
+struct Position{
+    var x:Int
+    var y:Int
+    
+    mutating func moveBy(dx dx:Int = 0, dy:Int = 0){
+        x += dx
+        y += dy
+    }
+    
+    // mutate self
+    mutating func moveTo(x x:Int, y:Int){
+        self = Position(x: x, y: y)
+    }
+}
+
+var pos1 = Position(x: 0,y: 0)
+pos1.moveBy(dx: 10,dy: 10)
+pos1.moveTo(x: 100, y: 100)
+
+let pos2 = Position(x: 0,y: 0)
+// pos2.moveBy(dx: 10,dy: 10) //error: cannot be mutated since pos2 is a constant
+// pos2.moveTo(x: 100, y: 100) //error: cannot be mutated since pos2 is a constant
+
+// Syntax with value type - Enumeration
+enum TrafficLight {
+    case Red, Amber, Green
+    mutating func next(){
+        switch self {
+        case .Red: self = .Green
+        case .Amber: self = .Red
+        case .Green: self = .Amber
+        }
+    }
+}
+var trafficLight = TrafficLight.Red
+trafficLight
+trafficLight.next()
+trafficLight.next()
+trafficLight.next()
+trafficLight.next()
+
+// Type Methods
+// Methods associated with a type. 
+// Type methods cannot access instance properties or methods
+// Type methods are declared using static keyword. 
+// Use class keyword to enable overriding of a class method in its subclass
+// Type methods are supported with generic types
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
