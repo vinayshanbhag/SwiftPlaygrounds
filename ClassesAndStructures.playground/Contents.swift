@@ -398,6 +398,10 @@ trafficLight.next()
 // Classes, Structure and Enumerations can define subscripts
 // Subscripts can be overloaded
 // Subscripts can be multi-dimensional
+// Subscripts can take any number of input parameters of any type
+// Subscript parameters can be variable and variadic
+// Subscript parameters cannot be inout and cannot have a default value
+
 
 // Syntax
 struct TimesTable {
@@ -412,25 +416,121 @@ let threeTimesTable = TimesTable(multiplier: 3)
 
 print("6 x 3 = \(threeTimesTable[6])")
 
-struct FizzBuzz {
-    subscript (index:Int)->String{
-        if index % 15 == 0{
-            return "fizzbuzz"
+// multidimensional subscripts
+struct Matrix:CustomStringConvertible {
+    let rows: Int, columns: Int
+    var grid: [Double]
+    init(rows: Int, columns: Int) {
+        self.rows = rows
+        self.columns = columns
+        grid = Array(count: rows * columns, repeatedValue: 0.0)
+    }
+    func indexIsValidForRow(row: Int, column: Int) -> Bool {
+        return row >= 0 && row < rows && column >= 0 && column < columns
+    }
+    subscript(row: Int, column: Int) -> Double {
+        get {
+            assert(indexIsValidForRow(row, column: column), "Index out of range")
+            return grid[(row * columns) + column]
         }
-        if index % 3 == 0{
-            return "fizz"
+        set {
+            assert(indexIsValidForRow(row, column: column), "Index out of range")
+            grid[(row * columns) + column] = newValue
         }
-        if index % 5 == 0{
-            return "buzz"
+    }
+    
+    var description:String {
+        var desc = ""
+        for var r = 0; r < rows; r++ {
+            for var c = 0; c < columns; c++ {
+                desc += "\(self[r,c])  "
+            }
+            desc += "\n"
         }
-        return ""
+        return desc
     }
 }
 
-let fizzbuzz = FizzBuzz()
-for i in 1...100 {
-    print("\(i):\(fizzbuzz[i])")
+var matrix = Matrix(rows: 3, columns: 3)
+matrix[0,0] = 1
+matrix[1,1] = 1
+matrix[2,2] = 1
+print(matrix)
+
+// A subscript with variadic parameters
+struct Multiply {
+    subscript(numbers:Int...)->Int{
+        var product = numbers.count > 0 ? 1 : 0
+        for number in numbers {
+            product *= number
+        }
+        return product
+    }
 }
+let multiply = Multiply()
+multiply[30,10,10,20]
+
+
+// Inheritance
+class Rectangle {
+    var width:Int
+    var height:Int
+    
+    init(w:Int, h:Int){
+        width = w
+        height = h
+        print("Rectangle.init")
+    }
+    
+    func area() -> Int{
+        print("Rectangle.area")
+        return width * height
+    }
+}
+class Square:Rectangle {
+    
+    init(side:Int){
+        super.init(w: side, h: side)
+        print("Square.init")
+    }
+    
+    final override func area() -> Int{
+        print("Square.area")
+        return width * width
+    }
+}
+
+var r:Rectangle
+r = Square(side: 2)
+r.area()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
