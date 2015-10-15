@@ -393,14 +393,44 @@ trafficLight.next()
 
 
 
+// Subscripts
+// Shortcuts to access members in a collection.
+// Classes, Structure and Enumerations can define subscripts
+// Subscripts can be overloaded
+// Subscripts can be multi-dimensional
 
+// Syntax
+struct TimesTable {
+    let multiplier:Int
+    
+    subscript(index:Int) -> Int {
+        return index * multiplier
+    }
+}
 
+let threeTimesTable = TimesTable(multiplier: 3)
 
+print("6 x 3 = \(threeTimesTable[6])")
 
+struct FizzBuzz {
+    subscript (index:Int)->String{
+        if index % 15 == 0{
+            return "fizzbuzz"
+        }
+        if index % 3 == 0{
+            return "fizz"
+        }
+        if index % 5 == 0{
+            return "buzz"
+        }
+        return ""
+    }
+}
 
-
-
-
+let fizzbuzz = FizzBuzz()
+for i in 1...100 {
+    print("\(i):\(fizzbuzz[i])")
+}
 
 
 
