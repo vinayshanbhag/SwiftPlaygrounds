@@ -107,4 +107,40 @@ for card in cards {
 }
 
 
+// A dictionary of arrays
+var dictionaryOfArrays = ["a":[1,2,3],"b":[4,5,6], "c":[7,8,9]]
+dictionaryOfArrays["b"]![1]
+for (key, array) in dictionaryOfArrays {
+    for item in array {
+        print("\(key): \(item)")
+    }
+}
+
+// An array of dictionaries
+var arrayOfDictionaries = [["a":1,"b":2],["c":3,"d":4]]
+arrayOfDictionaries[1]["c"]!
+for dictionary in arrayOfDictionaries.enumerate() {
+    for (key, value) in dictionary.element {
+        print("\(dictionary.index) \(key):\(value)")
+    }
+}
+
+// A dictionary of dictionaries
+var dictionaryOfDictionaries = ["a":["aa":"aardvaark", "an":"antelope"], "b":["bi":"bison", "bo":"boar"]]
+dictionaryOfDictionaries["b"]!["bo"]!
+for dictionary in dictionaryOfDictionaries {
+    for (key, value) in dictionary.1 {
+        print("\(dictionary.0): \(key):\(value)")
+    }
+}
+
+// An array of arrays
+var arrayOfArrays = [[1,2,3],[4,5],[6,7,8,9]]
+arrayOfArrays[1][1]
+for (index1, elements) in arrayOfArrays.enumerate(){
+    for (index2, element) in elements.enumerate(){
+        print("[\(index1)][\(index2)]: \(element)")
+    }
+}
+
 
